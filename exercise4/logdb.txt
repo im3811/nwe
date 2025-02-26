@@ -1,0 +1,87 @@
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:15.445972236
+Error that happened: Access denied for user 'root'@'localhost' (using password: YES)
+
+Stack Trace:
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:815)
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:438)
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:241)
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:189)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:682)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:230)
+	at MySQLDatabase.connect(MySQLDatabase.java:26)
+	at Equipment.main(Equipment.java:117)
+Current SQL state: 28000
+Error Code: 1045
+MySQL Exception: Access denied for user 'root'@'localhost' (using password: YES)
+********
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:15.45934565
+Error that happened: Cannot invoke "java.sql.Connection.close()" because "this.connection" is null
+
+Stack Trace:
+	at MySQLDatabase.close(MySQLDatabase.java:39)
+	at Equipment.main(Equipment.java:138)
+********
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:36.578393972
+Error that happened: Access denied for user 'root'@'localhost' (using password: YES)
+
+Stack Trace:
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:815)
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:438)
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:241)
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:189)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:682)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:230)
+	at MySQLDatabase.connect(MySQLDatabase.java:26)
+	at Equipment.main(Equipment.java:117)
+Current SQL state: 28000
+Error Code: 1045
+MySQL Exception: Access denied for user 'root'@'localhost' (using password: YES)
+********
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:36.593633977
+Error that happened: Cannot invoke "java.sql.Connection.close()" because "this.connection" is null
+
+Stack Trace:
+	at MySQLDatabase.close(MySQLDatabase.java:39)
+	at Equipment.main(Equipment.java:138)
+********
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:46.278898983
+Error that happened: Access denied for user 'root'@'localhost' (using password: YES)
+
+Stack Trace:
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:815)
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:438)
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:241)
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:189)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:682)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:230)
+	at MySQLDatabase.connect(MySQLDatabase.java:26)
+	at Equipment.main(Equipment.java:117)
+Current SQL state: 28000
+Error Code: 1045
+MySQL Exception: Access denied for user 'root'@'localhost' (using password: YES)
+********
+
+******* Exception Log ********
+Time of exception: 2025-02-20T07:06:46.293358016
+Error that happened: Cannot invoke "java.sql.Connection.close()" because "this.connection" is null
+
+Stack Trace:
+	at MySQLDatabase.close(MySQLDatabase.java:39)
+	at Equipment.main(Equipment.java:138)
+********
