@@ -134,32 +134,76 @@ public boolean fetch(MySQLDatabase database, boolean includeColumnNames) throws 
 
   public static void main(String[] args) {
     MySQLDatabase databaseConnection = new MySQLDatabase("localhost", 3306, "travel23", "root", "1234");
-
+  
     try {
       databaseConnection.connect();
-
-      Equipment testEquipment = new Equipment();
-      testEquipment.setEquipID(3644);
-
-      try {
-        if (testEquipment.fetch(databaseConnection)) {
-          System.out.println("Equipment ID: " + testEquipment.getEquipID());
-          System.out.println("Name: " + testEquipment.getEquipmentName());
-          System.out.println("Description: " + testEquipment.getEquipmentDescription());
-          System.out.println("Capacity: " + testEquipment.getEquipmentCapacity());
-        } else {
-          System.out.println("Equipment was not found");
-        }
-      } catch (DLException e) {
-        System.out.println("There was an error fetching equipment: " + e.getMessage());
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING DATABASE METADATA");
+      System.out.println("--------------------------------------------------");
+      databaseConnection.printDatabaseInfo();
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING TABLE METADATA FOR 'equipment'");
+      System.out.println("--------------------------------------------------");
+      databaseConnection.printTableInfo("equipment");
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING RESULT SET METADATA");
+      System.out.println("--------------------------------------------------");
+      String testQuery = "SELECT * FROM equipment WHERE EquipmentCapacity > 10";
+      databaseConnection.printResultInfo(testQuery);
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING fetch() WITH COLUMN NAMES");
+      System.out.println("--------------------------------------------------");
+      Equipment testEquipment1 = new Equipment();
+      testEquipment1.setEquipID(3644);
+      
+      if (testEquipment1.fetch(databaseConnection, true)) {
+        System.out.println("Equipment found with column names:");
+        System.out.println("Equipment ID: " + testEquipment1.getEquipID());
+        System.out.println("Name: " + testEquipment1.getEquipmentName());
+        System.out.println("Description: " + testEquipment1.getEquipmentDescription());
+        System.out.println("Capacity: " + testEquipment1.getEquipmentCapacity());
+      } else {
+        System.out.println("Equipment with ID 3644 was not found");
       }
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING getData() WITH COLUMN NAMES");
+      System.out.println("--------------------------------------------------");
+      ArrayList<ArrayList<String>> resultWithHeaders = databaseConnection.getData("SELECT * FROM equipment LIMIT 3", true);
+      System.out.println("Results with column headers:");
+      
+      // Print the results in a tabular format
+      for (ArrayList<String> row : resultWithHeaders) {
+        for (String value : row) {
+          System.out.print(value + "\t|\t");
+        }
+        System.out.println();
+      }
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING getData() WITHOUT COLUMN NAMES");
+      System.out.println("--------------------------------------------------");
+      ArrayList<ArrayList<String>> resultWithoutHeaders = databaseConnection.getData("SELECT * FROM equipment LIMIT 3", false);
+      System.out.println("Results without column headers:");
+      
+    
+      for (ArrayList<String> row : resultWithoutHeaders) {
+        for (String value : row) {
+          System.out.print(value + "\t|\t");
+        }
+        System.out.println();
+      }
+      
     } catch (Exception e) {
-      System.out.println("Connection to the database was not established" + e.getMessage());
+      System.out.println("Error in testing: " + e.getMessage());
     } finally {
       try {
         databaseConnection.close();
       } catch (DLException e) {
-        System.out.println("There was an error closing the database connection" + e.getMessage());
+        System.out.println("There was an error closing the database connection: " + e.getMessage());
       }
     }
   }
