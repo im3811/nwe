@@ -71,6 +71,28 @@ public class Equipment {
     }
   }
 
+public boolean fetch(MySQLDatabase database, boolean includeColumnNames) throws DLException {
+  try {
+    String selectQuery = "SELECT * FROM equipment WHERE EquipID = " + this.equipID;
+    ArrayList<ArrayList<String>> resultTable = database.getData(selectQuery, includeColumnNames);
+    
+    int dataRowIndex = includeColumnNames ? 1 : 0;
+    
+    if (resultTable.size() > dataRowIndex) {
+      ArrayList<String> dataRow = resultTable.get(dataRowIndex);
+      this.equipmentName = dataRow.get(1);
+      this.equipmentDescription = dataRow.get(2);
+      this.equipmentCapacity = Integer.parseInt(dataRow.get(3));
+      return true;
+    }
+    return false;
+  } catch (Exception e) {
+    System.out.println("There was an Error retrieving the equipment record");
+    throw new DLException(e);
+  }
+}
+
+
   public boolean put(MySQLDatabase database) throws DLException {
     try {
       String updateQuery = "UPDATE equipment SET " +
