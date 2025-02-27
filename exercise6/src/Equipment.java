@@ -132,6 +132,74 @@ public boolean fetch(MySQLDatabase database, boolean includeColumnNames) throws 
     }
   }
 
+  public boolean fetchP(MySQLDatabase database) throws DLException {
+    try {
+        String selectQuery = "SELECT * FROM equipment WHERE EquipID = ?";
+        ArrayList<String> params = new ArrayList<>();
+        params.add(String.valueOf(this.equipID));
+        
+        ArrayList<ArrayList<String>> resultTable = database.getData(selectQuery, params);
+        if (resultTable != null && resultTable.size() > 1) {
+            ArrayList<String> dataRow = resultTable.get(1); 
+            this.equipmentName = dataRow.get(1);
+            this.equipmentDescription = dataRow.get(2);
+            this.equipmentCapacity = Integer.parseInt(dataRow.get(3));
+            return true;
+        }
+        return false;
+    } catch (Exception e) {
+        System.out.println("There was an Error retrieving the equipment record");
+        throw new DLException(e);
+    }
+}
+
+
+public boolean putP(MySQLDatabase database) throws DLException {
+  try {
+      String updateQuery = "UPDATE equipment SET EquipmentName=?, EquipmentDescription=?, EquipmentCapacity=? WHERE EquipID=?";
+      ArrayList<String> params = new ArrayList<>();
+      params.add(this.equipmentName);
+      params.add(this.equipmentDescription);
+      params.add(String.valueOf(this.equipmentCapacity));
+      params.add(String.valueOf(this.equipID));
+      
+      return database.setData(updateQuery, params);
+  } catch (Exception e) {
+      System.out.println("There was an error updating the equipment record");
+      throw new DLException(e);
+  }
+}
+
+
+public boolean postP(MySQLDatabase database) throws DLException {
+  try {
+      String insertQuery = "INSERT INTO equipment (EquipID, EquipmentName, EquipmentDescription, EquipmentCapacity) VALUES (?, ?, ?, ?)";
+      ArrayList<String> params = new ArrayList<>();
+      params.add(String.valueOf(this.equipID));
+      params.add(this.equipmentName);
+      params.add(this.equipmentDescription);
+      params.add(String.valueOf(this.equipmentCapacity));
+      
+      return database.setData(insertQuery, params);
+  } catch (Exception e) {
+      System.out.println("There was an error inserting the equipment record");
+      throw new DLException(e);
+  }
+}
+
+public boolean removeP(MySQLDatabase database) throws DLException {
+  try {
+      String deleteQuery = "DELETE FROM equipment WHERE EquipID = ?";
+      ArrayList<String> params = new ArrayList<>();
+      params.add(String.valueOf(this.equipID));
+      
+      return database.setData(deleteQuery, params);
+  } catch (Exception e) {
+      System.out.println("There was an error deleting the equipment record");
+      throw new DLException(e);
+  }
+}
+
   public static void main(String[] args) {
     MySQLDatabase databaseConnection = new MySQLDatabase("localhost", 3306, "travel23", "root", "1234");
   

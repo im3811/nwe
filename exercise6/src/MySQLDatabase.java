@@ -5,7 +5,8 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.sql.Statement;
 import java.sql.DatabaseMetaData;
-
+import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 public class MySQLDatabase {
 
   private String serverAddress;
@@ -104,6 +105,39 @@ public class MySQLDatabase {
     }
   }
 
+
+  public ArrayList<ArrayList<String>> getData(String sql, ArrayList<String> values) throws DLException {
+    ArrayList<ArrayList<String>> dataTable = new ArrayList<>();
+    try {
+        PreparedStatement pstmt = prepare(sql, values);
+        ResultSet queryResults = pstmt.executeQuery();
+        ResultSetMetaData metaData = queryResults.getMetaData();
+        int numColumns = metaData.getColumnCount();
+        
+        ArrayList<String> headerRow = new ArrayList<>();
+        for (int colIndex = 1; colIndex <= numColumns; colIndex++) {
+            headerRow.add(metaData.getColumnName(colIndex));
+        }
+        dataTable.add(headerRow);
+        
+        while (queryResults.next()) {
+            ArrayList<String> currentRow = new ArrayList<>();
+            for (int colIndex = 1; colIndex <= numColumns; colIndex++) {
+                String cellValue = queryResults.getString(colIndex);
+                currentRow.add(cellValue != null ? cellValue : "");
+            }
+            dataTable.add(currentRow);
+        }
+        
+        queryResults.close();
+        pstmt.close();
+        return dataTable;
+    } catch (Exception e) {
+        System.out.println("There was an error executing the prepared statement query");
+        return null;
+    }
+}
+
   public boolean setData(String query) throws DLException {
     try {
       Statement dbStatement = connection.createStatement();
@@ -115,6 +149,20 @@ public class MySQLDatabase {
       throw new DLException(e);
     }
   }
+
+  public boolean setData(String sql, ArrayList<String> values) throws DLException {
+    try {
+        PreparedStatement pstmt = prepare(sql, values);
+        pstmt.executeUpdate();
+        pstmt.close();
+        return true;
+    } catch (Exception e) {
+        System.out.println("There was an error executing the prepared statement update");
+        throw new DLException(e);
+    }
+}
+
+
 
   public void printDatabaseInfo() throws DLException {
     try {
@@ -221,5 +269,60 @@ public class MySQLDatabase {
       throw new DLException(e);
     }
   }
+
+  public PreparedStatement prepare(String sql, ArrayList<String> values) throws DLException {
+    try {
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        if (values != null) {
+            for (int i = 0; i < values.size(); i++) {
+                String value = values.get(i);
+                int paramIndex = i + 1;
+                pstmt.setString(paramIndex, value);
+            }
+        } 
+        return pstmt;
+    } catch (Exception e) {
+        System.out.println("There was an error preparing the statement");
+        throw new DLException(e);
+    }
+}
+
+
+public int executeProc(String procName, ArrayList<String> values) throws DLException {
+  try {
+      StringBuilder callStatement = new StringBuilder("{CALL " + procName + "(");
+      if (values != null && !values.isEmpty()) {
+          for (int i = 0; i < values.size(); i++) {
+              callStatement.append("?");
+              if (i < values.size() - 1) {
+                  callStatement.append(",");
+              }
+          }
+      }
+      callStatement.append(")}");
+      
+      CallableStatement cstmt = connection.prepareCall(callStatement.toString());
+      
+      cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+      
+      if (values != null) {
+          for (int i = 0; i < values.size(); i++) {
+              cstmt.setString(i + 1, values.get(i));
+          }
+      }
+      
+      cstmt.execute();
+      
+      int result = cstmt.getInt(1);
+      
+      cstmt.close();
+      
+      return result;
+  } catch (Exception e) {
+      System.out.println("There was an error executing the stored procedure");
+      throw new DLException(e);
+  }
+}
+
 
 }
