@@ -200,79 +200,38 @@ public boolean removeP(MySQLDatabase database) throws DLException {
   }
 }
 
-  public static void main(String[] args) {
-    MySQLDatabase databaseConnection = new MySQLDatabase("localhost", 3306, "travel23", "root", "1234");
-  
-    try {
+public static void main(String[] args) {
+  MySQLDatabase databaseConnection = new MySQLDatabase("localhost", 3306, "travel23", "root", "1234");
+
+  try {
       databaseConnection.connect();
-      System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING DATABASE METADATA");
-      System.out.println("--------------------------------------------------");
-      databaseConnection.printDatabaseInfo();
       
       System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING TABLE METADATA FOR 'equipment'");
+      System.out.println("TESTING fetchP WITH PREPARED STATEMENTS");
       System.out.println("--------------------------------------------------");
-      databaseConnection.printTableInfo("equipment");
       
-      System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING RESULT SET METADATA");
-      System.out.println("--------------------------------------------------");
-      String testQuery = "SELECT * FROM equipment WHERE EquipmentCapacity > 10";
-      databaseConnection.printResultInfo(testQuery);
+      Equipment testEquipment = new Equipment();
+      testEquipment.setEquipID(3644); 
       
-      System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING fetch() WITH COLUMN NAMES");
-      System.out.println("--------------------------------------------------");
-      Equipment testEquipment1 = new Equipment();
-      testEquipment1.setEquipID(3644);
-      
-      if (testEquipment1.fetch(databaseConnection, true)) {
-        System.out.println("Equipment found with column names:");
-        System.out.println("Equipment ID: " + testEquipment1.getEquipID());
-        System.out.println("Name: " + testEquipment1.getEquipmentName());
-        System.out.println("Description: " + testEquipment1.getEquipmentDescription());
-        System.out.println("Capacity: " + testEquipment1.getEquipmentCapacity());
+      if (testEquipment.fetchP(databaseConnection)) {
+          System.out.println("Equipment found using prepared statements:");
+          System.out.println("Equipment ID: " + testEquipment.getEquipID());
+          System.out.println("Name: " + testEquipment.getEquipmentName());
+          System.out.println("Description: " + testEquipment.getEquipmentDescription());
+          System.out.println("Capacity: " + testEquipment.getEquipmentCapacity());
       } else {
-        System.out.println("Equipment with ID 3644 was not found");
+          System.out.println("Equipment with ID 3644 was not found");
       }
       
-      System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING getData() WITH COLUMN NAMES");
-      System.out.println("--------------------------------------------------");
-      ArrayList<ArrayList<String>> resultWithHeaders = databaseConnection.getData("SELECT * FROM equipment LIMIT 3", true);
-      System.out.println("Results with column headers:");
-      
-      for (ArrayList<String> row : resultWithHeaders) {
-        for (String value : row) {
-          System.out.print(value + "\t|\t");
-        }
-        System.out.println();
-      }
-      
-      System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING getData() WITHOUT COLUMN NAMES");
-      System.out.println("--------------------------------------------------");
-      ArrayList<ArrayList<String>> resultWithoutHeaders = databaseConnection.getData("SELECT * FROM equipment LIMIT 3", false);
-      System.out.println("Results without column headers:");
-      
-    
-      for (ArrayList<String> row : resultWithoutHeaders) {
-        for (String value : row) {
-          System.out.print(value + "\t|\t");
-        }
-        System.out.println();
-      }
-      
-    } catch (Exception e) {
+  } catch (Exception e) {
       System.out.println("Error in testing: " + e.getMessage());
-    } finally {
+  } finally {
       try {
-        databaseConnection.close();
+          databaseConnection.close();
       } catch (DLException e) {
-        System.out.println("There was an error closing the database connection: " + e.getMessage());
+          System.out.println("There was an error closing the database connection: " + e.getMessage());
       }
-    }
   }
+}
 
 }
