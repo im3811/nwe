@@ -48,6 +48,38 @@ public class MySQLDatabase {
     }
   }
 
+   public boolean startTrans() throws DLException {
+    try {
+      connection.setAutoCommit(false);
+      return true;
+    } catch (Exception e) {
+      System.out.println("Error starting the transaction");
+      throw new DLException(e);
+    }
+  }
+
+  public boolean endTrans() throws DLException {
+    try {
+      connection.commit();
+      connection.setAutoCommit(true); 
+      return true;
+    } catch (Exception e) {
+      System.out.println("Error commiting the transaction");
+      throw new DLException(e);
+    }
+  }
+
+  public boolean rollbackTrans() throws DLException {
+    try {
+      connection.rollback();
+      connection.setAutoCommit(true); 
+      return true;
+    } catch (Exception e) {
+      System.out.println("Error rolling back the transaction");
+      throw new DLException(e);
+    }
+  }
+
   public ArrayList<ArrayList<String>> getData(String query) throws DLException {
     ArrayList<ArrayList<String>> dataTable = new ArrayList<>();
     try {

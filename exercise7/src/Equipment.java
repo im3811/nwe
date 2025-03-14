@@ -200,6 +200,51 @@ public boolean removeP(MySQLDatabase database) throws DLException {
   }
 }
 
+public boolean swapEquipNames(MySQLDatabase database, int id) throws DLException {
+  try {
+    database.startTrans();
+    
+    Equipment otherEquipment = new Equipment(id);
+    
+    boolean thisFound = this.fetchP(database);
+    boolean otherFound = otherEquipment.fetchP(database);
+    
+    if (!thisFound || !otherFound) {
+      database.rollbackTrans();
+      System.out.println("cant find one or both equipment pieces");
+      return false;
+    }
+    
+    String thisName = this.equipmentName;
+    String otherName = otherEquipment.getEquipmentName();
+    
+    this.equipmentName = otherName;
+    otherEquipment.setEquipmentName(thisName);
+    
+    boolean thisUpdated = this.putP(database);
+    boolean otherUpdated = otherEquipment.putP(database);
+    
+    if (!thisUpdated || !otherUpdated) {
+      database.rollbackTrans();
+      System.out.println("update failed on one or both equipment records");
+      return false;
+    }
+    
+    database.endTrans();
+    return true;
+    
+  } catch (Exception e) {
+    try {
+      database.rollbackTrans();
+    } catch (DLException rollbackEx) {
+      System.out.println("Error happened during rollback transaction: " + rollbackEx.getMessage());
+    }
+    
+    System.out.println("Error happened after swapping equipment names: " + e.getMessage());
+    throw new DLException(e);
+  }
+}
+
 public static void main(String[] args) {
   MySQLDatabase databaseConnection = new MySQLDatabase("localhost", 3306, "travel23", "root", "1234");
 
@@ -207,24 +252,78 @@ public static void main(String[] args) {
       databaseConnection.connect();
       
       System.out.println("\n------------------------------------------------");
-      System.out.println("TESTING fetchP WITH PREPARED STATEMENTS");
+      System.out.println("FETCHING EQUIPMENT OBJECTS");
       System.out.println("--------------------------------------------------");
       
-      Equipment testEquipment = new Equipment();
-      testEquipment.setEquipID(3644); 
+      Equipment equipment1 = new Equipment();
+      equipment1.setEquipID(1256);
       
-      if (testEquipment.fetchP(databaseConnection)) {
-          System.out.println("Equipment found using prepared statements:");
-          System.out.println("Equipment ID: " + testEquipment.getEquipID());
-          System.out.println("Name: " + testEquipment.getEquipmentName());
-          System.out.println("Description: " + testEquipment.getEquipmentDescription());
-          System.out.println("Capacity: " + testEquipment.getEquipmentCapacity());
+      Equipment equipment2 = new Equipment();
+      equipment2.setEquipID(5634);
+      
+      System.out.println("Initial Equipment Data:");
+      
+      if (equipment1.fetchP(databaseConnection)) {
+          System.out.println("\nEquipment 1:");
+          System.out.println("Equipment ID: " + equipment1.getEquipID());
+          System.out.println("Name: " + equipment1.getEquipmentName());
+          System.out.println("Description: " + equipment1.getEquipmentDescription());
+          System.out.println("Capacity: " + equipment1.getEquipmentCapacity());
       } else {
-          System.out.println("Equipment with ID 3644 was not found");
+          System.out.println("Equipment with ID " + equipment1.getEquipID() + " was not found");
+      }
+      
+      if (equipment2.fetchP(databaseConnection)) {
+          System.out.println("\nEquipment 2:");
+          System.out.println("Equipment ID: " + equipment2.getEquipID());
+          System.out.println("Name: " + equipment2.getEquipmentName());
+          System.out.println("Description: " + equipment2.getEquipmentDescription());
+          System.out.println("Capacity: " + equipment2.getEquipmentCapacity());
+      } else {
+          System.out.println("Equipment with ID " + equipment2.getEquipID() + " was not found");
+      }
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("TESTING NAME SWAP WITHIN TRANSACTION");
+      System.out.println("--------------------------------------------------");
+      
+      boolean swapResult = equipment1.swapEquipNames(databaseConnection, equipment2.getEquipID());
+      
+      if (swapResult) {
+          System.out.println("Equipment names swapped successfully");
+      } else {
+          System.out.println("Failed to swap equipment names");
+      }
+      
+      System.out.println("\n------------------------------------------------");
+      System.out.println("SHOWING UPDATED EQUIPMENT DATA");
+      System.out.println("--------------------------------------------------");
+      
+      System.out.println("Updated Equipment Data:");
+      
+      if (equipment1.fetchP(databaseConnection)) {
+          System.out.println("\nEquipment 1 (After Swap):");
+          System.out.println("Equipment ID: " + equipment1.getEquipID());
+          System.out.println("Name: " + equipment1.getEquipmentName());
+          System.out.println("Description: " + equipment1.getEquipmentDescription());
+          System.out.println("Capacity: " + equipment1.getEquipmentCapacity());
+      } else {
+          System.out.println("Equipment with ID " + equipment1.getEquipID() + " was not found");
+      }
+      
+      if (equipment2.fetchP(databaseConnection)) {
+          System.out.println("\nEquipment 2 (After Swap):");
+          System.out.println("Equipment ID: " + equipment2.getEquipID());
+          System.out.println("Name: " + equipment2.getEquipmentName());
+          System.out.println("Description: " + equipment2.getEquipmentDescription());
+          System.out.println("Capacity: " + equipment2.getEquipmentCapacity());
+      } else {
+          System.out.println("Equipment with ID " + equipment2.getEquipID() + " was not found");
       }
       
   } catch (Exception e) {
       System.out.println("Error in testing: " + e.getMessage());
+      e.printStackTrace();
   } finally {
       try {
           databaseConnection.close();
